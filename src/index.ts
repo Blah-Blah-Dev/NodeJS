@@ -136,10 +136,10 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
         const details = await getVideoDetails(videoId);
         if (details) {
           const comment = await phraseComment({
-            apiKey: config.openAiApiKey,
+            openAiApiKey: config.openAiApiKey,
+            openAiModel: config.openAiModel,
             title: details.title,
             description: details.description,
-            model: config.model,
             llmConfig,
           });
 

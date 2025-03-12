@@ -5,16 +5,16 @@ import { LLMConfig } from "../types/llm-config";
  * Generates a YouTube comment using OpenAI based on customizable options.
  */
 export default async function generateYouTubeComment({
-  apiKey,
+  openAiApiKey,
+  openAiModel = "gpt-4o-mini-2024-07-18",
   title,
   description,
-  model = "gpt-4o-mini-2024-07-18",
   llmConfig,
 }: {
-  apiKey: string;
+  openAiApiKey: string;
+  openAiModel?: OpenAI.Chat.ChatModel;
   title: string;
   description: string;
-  model?: OpenAI.Chat.ChatModel;
   llmConfig: LLMConfig;
 }): Promise<string | null> {
   const prompt = llmConfig.prompt
@@ -23,11 +23,11 @@ export default async function generateYouTubeComment({
 
   try {
     const openai = new OpenAI({
-      apiKey,
+      apiKey: openAiApiKey,
     });
 
     const completion = await openai.chat.completions.create({
-      model,
+      model: openAiModel,
       messages: [
         {
           role: "system",

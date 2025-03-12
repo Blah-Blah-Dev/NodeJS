@@ -4,7 +4,7 @@ import { LLMConfig } from "./llm-config";
 export interface ScriptConfig {
   projectId?: string;
   openAiApiKey: string;
-  model?: OpenAI.Chat.ChatModel;
+  openAiModel?: OpenAI.Chat.ChatModel;
   googleClientId: string;
   googleClientSecret: string;
   googleRefreshToken: string;
