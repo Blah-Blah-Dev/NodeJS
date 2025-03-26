@@ -208,15 +208,16 @@ export default async function (config: ScriptConfig) {
       !llmConfig.modelInstructions ||
       typeof llmConfig.modelInstructions !== "string"
     ) {
-      console.error(`Invalid LLM config`);
+      console.error(
+        `Blah-Blah: Invalid LLM config. Please pass either a project ID or your own prompt configuration.`
+      );
       return;
     }
 
     if (config.llmConfig && !config.projectId) {
-      console.warn(upgradeMessage);
-    } else {
-      console.log(`🚀 BlahBlah initiated successfully`);
+      console.log(upgradeMessage);
     }
+    console.log(`🚀 BlahBlah initiated successfully`);
 
     return startCronJob(config, llmConfig);
   } catch (error) {
