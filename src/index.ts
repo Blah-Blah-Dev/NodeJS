@@ -6,6 +6,7 @@ import phraseComment from "./helpers/phraseComment";
 import { ScriptConfig } from "./types/script-config";
 import validateScriptConfig from "./helpers/validateScriptConfig";
 import { LLMConfig } from "./types/llm-config";
+import { upgradeMessage } from "./consts/upgrade-message";
 
 // Utility function
 function getTimeISO(minutesOffset: number): string {
@@ -176,18 +177,28 @@ export default async function (config: ScriptConfig) {
       return;
     }
 
-    let llmConfig: LLMConfig;
+    let llmConfig: LLMConfig | null = null;
 
     if (config.llmConfig) {
       llmConfig = config.llmConfig;
-    } else {
+    } else if (config.projectId) {
       const response = await axios.get(
-        `https://api.blahblah.dev/api/v1/projects/${
-          config.projectId ?? "default"
-        }`
+        `https://api.blahblah.dev/api/v1/projects/${config.projectId}`
       );
 
-      llmConfig = response.data as LLMConfig;
+      const { isPremium, config: responseConfig } = response.data as {
+        isPremium: boolean;
+        config: LLMConfig;
+      };
+
+      if (!isPremium) {
+        console.error(
+          "To use BlahBlah's tailor-made premium prompt, please upgrade your project in the dashboard: https://my.blahblah.dev\n\nAlternatively, pass your own prompt to the package on initialization."
+        );
+        return;
+      }
+
+      llmConfig = responseConfig;
     }
 
     if (
@@ -201,7 +212,12 @@ export default async function (config: ScriptConfig) {
       return;
     }
 
-    console.log(`BlahBlah validated successfully`);
+    if (config.llmConfig && !config.projectId) {
+      console.warn(upgradeMessage);
+    } else {
+      console.log(`🚀 BlahBlah initiated successfully`);
+    }
+
     return startCronJob(config, llmConfig);
   } catch (error) {
     console.error("Error starting cron job:", error);
