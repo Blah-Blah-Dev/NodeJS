@@ -39,7 +39,7 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
     // This represents the latest potential publish time of the videos we fetch
     let latestPublish = 30;
     // This represents the oldest potential publish time of the videos we fetch
-    let oldestPublish = 90;
+    let oldestPublish = 89;
 
     if (config.publishTimeframe) {
       if (
