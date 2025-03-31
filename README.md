@@ -125,6 +125,11 @@ To post comments via the YouTube Data API, follow these steps to set up a projec
      GOOGLE_CLIENT_SECRET=your-google-client-secret
      ```
 
+5. Add your email as a test user
+
+  - In the OAuth Consent Screen menu, navigate to "Audience".
+  - Scroll down, and add your own email (yes yes, the one which owns this project) as a test user.
+
 ### 4. Generate the Refresh Token
 
 To allow the script to post comments on your behalf (without manual user intervention every time), you need a **Refresh Token**.
