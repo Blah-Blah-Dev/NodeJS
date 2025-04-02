@@ -105,8 +105,8 @@ To post comments via the YouTube Data API, follow these steps to set up a projec
 
 3. **Create OAuth consent screen** (if not already set up):
 
-   - In **APIs & Services**, go to **OAuth consent screen**.
-   - Select **External** or **Internal** based on your use case.
+   - In **APIs & Services**, go to **OAuth consent screen** and click "Get Started".
+   - Select **External**.
    - Add any required information (app name, support email, etc.) and save.
 
 4. **Create OAuth Client ID & Client Secret**:

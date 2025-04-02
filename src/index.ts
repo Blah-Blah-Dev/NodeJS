@@ -6,7 +6,14 @@ import phraseComment from "./helpers/phraseComment";
 import { ScriptConfig } from "./types/script-config";
 import validateScriptConfig from "./helpers/validateScriptConfig";
 import { LLMConfig } from "./types/llm-config";
-import { upgradeMessage } from "./consts/upgrade-message";
+import {
+  invalidConfigMessage,
+  invalidLLMConfigMessage,
+  successMessage,
+  upgradeMessage,
+  upgradeRequiredMessage,
+  videoScheduleMessage,
+} from "./consts/upgrade-message";
 
 // Utility function
 function getTimeISO(minutesOffset: number): string {
@@ -64,6 +71,7 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
       const response = await youtube.search.list({
         part: ["snippet"],
         q: query,
+        order: "viewCount",
         type: ["video"],
         publishedAfter,
         publishedBefore,
@@ -102,7 +110,7 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
   // Post a comment
   async function postComment(videoId: string, commentText: string) {
     try {
-      await youtube.commentThreads.insert({
+      const response = await youtube.commentThreads.insert({
         part: ["snippet"],
         requestBody: {
           snippet: {
@@ -115,7 +123,15 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
           },
         },
       });
-      console.log(`Comment posted on video ${videoId}`);
+      const commentId = response.data.id;
+      const publishedText =
+        response.data.snippet?.topLevelComment?.snippet?.textOriginal;
+
+      if (commentId && publishedText) {
+        console.log(
+          `✅ Comment posted on video https://www.youtube.com/watch?v=${videoId}`
+        );
+      }
     } catch (error) {
       console.error(`Error posting comment on video ${videoId}:`, error);
     }
@@ -171,9 +187,8 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
 
 export default async function (config: ScriptConfig) {
   try {
-    // Validate the configuration object to make sure we received all required parameters
     if (!validateScriptConfig(config)) {
-      console.error(`Invalid script config: ${config.projectId}`);
+      console.error(invalidConfigMessage);
       return;
     }
 
@@ -192,9 +207,7 @@ export default async function (config: ScriptConfig) {
       };
 
       if (!isPremium) {
-        console.error(
-          "To use BlahBlah's tailor-made premium prompt, please upgrade your project in the dashboard: https://my.blahblah.dev\n\nAlternatively, pass your own prompt to the package on initialization."
-        );
+        console.error(upgradeRequiredMessage);
         return;
       }
 
@@ -208,20 +221,20 @@ export default async function (config: ScriptConfig) {
       !llmConfig.modelInstructions ||
       typeof llmConfig.modelInstructions !== "string"
     ) {
-      console.error(
-        `Blah-Blah: Invalid LLM config. Please pass either a project ID or your own prompt configuration.`
-      );
+      console.error(invalidLLMConfigMessage);
       return;
     }
 
     if (config.llmConfig && !config.projectId) {
       console.log(upgradeMessage);
     }
-    console.log(`🚀 BlahBlah initiated successfully`);
+
+    console.log(successMessage);
+    console.log(videoScheduleMessage);
 
     return startCronJob(config, llmConfig);
   } catch (error) {
     console.error("Error starting cron job:", error);
-    throw error; // Rethrow for caller to handle
+    throw error;
   }
 }
