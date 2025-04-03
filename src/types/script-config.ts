@@ -9,7 +9,8 @@ export interface ScriptConfig {
   googleClientSecret: string;
   googleRefreshToken: string;
   llmConfig?: LLMConfig;
-  searchTerms: string[];
+  exactSearchTerms?: string[];
+  looseSearchTerms?: string[];
   resultsPerJob?: number;
   publishTimeframe?: {
     min: number;

@@ -63,9 +63,15 @@ export async function startCronJob(config: ScriptConfig, llmConfig: LLMConfig) {
 
     const publishedBefore = getTimeISO(latestPublish);
     const publishedAfter = getTimeISO(oldestPublish);
-    const query = config.searchTerms
-      .map((term) => `"${term.toLowerCase()}"`)
-      .join(" OR ");
+
+    const allTerms = [
+      ...(config.exactSearchTerms || []).map(
+        (term) => `"${term.toLowerCase()}"`
+      ),
+      ...(config.looseSearchTerms || []),
+    ];
+
+    const query = allTerms.join(" OR ");
 
     try {
       const response = await youtube.search.list({

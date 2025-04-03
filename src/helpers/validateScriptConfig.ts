@@ -21,5 +21,16 @@ export default (config: ScriptConfig) => {
     return false;
   }
 
+  if (
+    (config.exactSearchTerms || []).length +
+      (config.looseSearchTerms || []).length ===
+    0
+  ) {
+    console.error(
+      "Please at least one search term, either exact, loose or both"
+    );
+    return false;
+  }
+
   return true;
 };
